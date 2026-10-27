@@ -38,7 +38,7 @@ A nota varia de **0 a 100**, onde maior significa **maior risco**.
 ---
 
 ## 4. Telas do Sistema
-Todas as telas ficam dentro de uma moldura branca sobre fundo escuro, com uma barra de ícones à esquerda (no celular, barra inferior): Mapa, Operações, Clima (Etapa 2), Simulador (Etapa 4) e Sobre.
+Todas as telas ficam dentro de uma moldura branca sobre fundo escuro, com uma barra de ícones à esquerda: Mapa, Operações, Clima, Simulador e Sobre, e no rodapé Configurações e Sair. No celular, a barra fica embaixo e mostra só os 5 itens principais.
 
 - **Mapa (`/`)**:
   - Mapa de satélite em tela cheia (alternável para OpenStreetMap), com fonte citada.
@@ -53,3 +53,4 @@ Todas as telas ficam dentro de uma moldura branca sobre fundo escuro, com uma ba
   - Gráfico de evolução da nota nos últimos 6 meses.
   - Espaço "Por que a nota mudou", com os sinais das Etapas 2, 3 e 4.
 - **Sobre (`/sobre`)**: pesos e faixas da nota (lidos da configuração) e fontes de dados.
+- **Telas provisórias**: `/clima`, `/simulador`, `/configuracoes` e `/sair` mostram por enquanto só o título centralizado.

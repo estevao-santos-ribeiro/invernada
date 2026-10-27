@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, Marker, TileLayer, Tooltip, ZoomControl, useMap } from "react-leaflet";
 import L from "leaflet";
 import type { Operation } from "@/lib/schemas/operation";
@@ -63,6 +63,13 @@ export interface RiskMapProps {
 export default function RiskMap({ operations, selectedId, layer, focusRequest, onSelect }: RiskMapProps) {
   const tileLayer = MAP_LAYERS[layer];
   const selected = operations.find((op) => op.id === selectedId);
+  const [mapKey, setMapKey] = useState(0);
+
+  // Com Cache Components, o Next esconde a rota com <Activity> em vez de desmontar.
+  // O cleanup do MapContainer chama map.remove(), mas o estado do componente fica
+  // preservado apontando para o mapa destruído. Trocar a key ao esconder garante
+  // um MapContainer novo quando a rota volta a ficar visível.
+  useLayoutEffect(() => () => setMapKey((k) => k + 1), []);
 
   const icons = useMemo(() => {
     const map = new Map<string, L.DivIcon>();
@@ -72,6 +79,7 @@ export default function RiskMap({ operations, selectedId, layer, focusRequest, o
 
   return (
     <MapContainer
+      key={mapKey}
       center={[-30.7, -54.7]}
       zoom={8}
       zoomControl={false}

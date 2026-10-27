@@ -28,9 +28,13 @@ campora/
 │       ├── operacoes/
 │       │   ├── page.tsx           # "/operacoes" Lista ordenada por risco
 │       │   └── [id]/page.tsx      # "/operacoes/[id]" Detalhe da operação
-│       └── sobre/page.tsx         # "/sobre" Modelo da nota e fontes de dados
+│       ├── sobre/page.tsx         # "/sobre" Modelo da nota e fontes de dados
+│       ├── clima/page.tsx         # "/clima" Tela provisória (Etapa 2)
+│       ├── simulador/page.tsx     # "/simulador" Tela provisória (Etapa 4)
+│       ├── configuracoes/page.tsx # "/configuracoes" Tela provisória
+│       └── sair/page.tsx          # "/sair" Tela provisória (sem logout ainda)
 ├── components/
-│   ├── shell/                     # app-shell.tsx (moldura, PageSurface), sidebar.tsx (desktop e celular)
+│   ├── shell/                     # app-shell.tsx (moldura, PageSurface), sidebar.tsx, placeholder-screen.tsx
 │   ├── map/
 │   │   ├── map-explorer.tsx       # Estado da tela do mapa: filtros, seleção, camada, cartão
 │   │   ├── risk-map.tsx           # MapContainer, tiles, marcadores, tooltip, enquadramento

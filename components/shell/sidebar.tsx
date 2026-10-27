@@ -18,47 +18,29 @@ import { cn } from "@/lib/utils";
 interface NavItem {
   label: string;
   icon: LucideIcon;
-  href?: string;
-  /** Quando preenchido, o item aparece desabilitado com o aviso "em breve". */
-  soon?: string;
+  href: string;
 }
 
 const MAIN_ITEMS: NavItem[] = [
   { label: "Mapa", icon: MapIcon, href: "/" },
   { label: "Operações", icon: List, href: "/operacoes" },
-  { label: "Clima", icon: CloudSun, soon: "Etapa 2" },
-  { label: "Simulador", icon: SlidersHorizontal, soon: "Etapa 4" },
+  { label: "Clima", icon: CloudSun, href: "/clima" },
+  { label: "Simulador", icon: SlidersHorizontal, href: "/simulador" },
   { label: "Sobre", icon: Info, href: "/sobre" },
 ];
 
+/** Itens do rodapé da barra lateral (só no desktop). */
 const FOOTER_ITEMS: NavItem[] = [
-  { label: "Configurações", icon: Settings, soon: "em breve" },
-  { label: "Sair", icon: LogOut, soon: "sem login nesta etapa" },
+  { label: "Configurações", icon: Settings, href: "/configuracoes" },
+  { label: "Sair", icon: LogOut, href: "/sair" },
 ];
 
-function isActive(pathname: string, href?: string) {
-  if (!href) return false;
+function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
 function NavButton({ item, active }: { item: NavItem; active: boolean }) {
   const Icon = item.icon;
-  const base =
-    "grid h-11 w-11 shrink-0 place-items-center rounded-full border transition-colors";
-
-  if (!item.href) {
-    return (
-      <span
-        role="link"
-        aria-disabled="true"
-        aria-label={`${item.label} (${item.soon})`}
-        title={`${item.label} — ${item.soon}`}
-        className={cn(base, "cursor-not-allowed border-zinc-200 text-zinc-300")}
-      >
-        <Icon className="h-[18px] w-[18px]" />
-      </span>
-    );
-  }
 
   return (
     <Link
@@ -67,7 +49,7 @@ function NavButton({ item, active }: { item: NavItem; active: boolean }) {
       aria-current={active ? "page" : undefined}
       title={item.label}
       className={cn(
-        base,
+        "grid h-11 w-11 shrink-0 place-items-center rounded-full border transition-colors",
         active
           ? "border-zinc-950 bg-zinc-950 text-white"
           : "border-zinc-200 text-zinc-800 hover:bg-zinc-100"
@@ -100,7 +82,7 @@ export function Sidebar() {
 
       <div className="flex flex-col gap-3">
         {FOOTER_ITEMS.map((item) => (
-          <NavButton key={item.label} item={item} active={false} />
+          <NavButton key={item.label} item={item} active={isActive(pathname, item.href)} />
         ))}
       </div>
     </aside>
