@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { PlaceholderScreen } from "@/components/shell/placeholder-screen";
+import { PageSurface } from "@/components/shell/app-shell";
+import { ClimateDashboard } from "@/components/clima/climate-dashboard";
 
 export const metadata: Metadata = {
-  title: "Clima",
-  description: "Clima recente comparado com o normal de cada fazenda.",
+  title: "Clima · Serra Catarinense",
+  description: "Monitoramento agrometeorológico e de geadas para pecuária de corte na Serra Catarinense (Lages e região).",
 };
 
 export default function ClimaPage() {
-  return <PlaceholderScreen title="Clima" />;
+  return (
+    <PageSurface>
+      <ClimateDashboard />
+    </PageSurface>
+  );
 }

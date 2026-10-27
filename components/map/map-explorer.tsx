@@ -11,6 +11,9 @@ import { applyFilters, EMPTY_FILTERS, type OperationFilters } from "@/lib/filter
 import { cn } from "@/lib/utils";
 import { FilterBar } from "@/components/filters/filter-bar";
 import { FarmCard } from "@/components/farm/farm-card";
+import { TimelineSelector } from "@/components/operations/timeline-selector";
+import { getOperationsAtMonth } from "@/lib/operations";
+import type { MonthIndex } from "@/lib/indicator";
 
 // Leaflet usa window: carregado só no cliente.
 const RiskMap = dynamic(() => import("./risk-map"), {
@@ -52,7 +55,7 @@ function Legend() {
         return (
           <span key={level} className="flex items-center gap-1.5">
             <span className={cn("h-2.5 w-2.5 rounded-full", b.bgClass, level === "high" && "animate-pulse")} />
-            {b.min}–{b.max}
+            {b.label} ({level === "low" ? "≥ 70" : level === "medium" ? "50–69" : "< 50"})
           </span>
         );
       })}
@@ -61,12 +64,22 @@ function Legend() {
 }
 
 export function MapExplorer({ operations }: { operations: Operation[] }) {
+  const [selectedMonth, setSelectedMonth] = useState<MonthIndex>(2); // Jun/26 por padrão (pico do inverno)
   const [filters, setFilters] = useState<OperationFilters>(EMPTY_FILTERS);
   const [selectedId, setSelectedId] = useState<string | undefined>(operations[0]?.id);
   const [layer, setLayer] = useState<MapLayerId>(DEFAULT_MAP_LAYER);
   const [focusRequest, setFocusRequest] = useState(0);
 
-  const visible = useMemo(() => applyFilters(operations, filters), [operations, filters]);
+  const operationsAtMonth = useMemo(
+    () => getOperationsAtMonth(operations, selectedMonth),
+    [operations, selectedMonth]
+  );
+
+  const visible = useMemo(
+    () => applyFilters(operationsAtMonth, filters),
+    [operationsAtMonth, filters]
+  );
+
   // Se a selecionada saiu do filtro, mostra a de maior risco restante.
   const selected = visible.find((op) => op.id === selectedId) ?? visible[0];
 
@@ -86,11 +99,16 @@ export function MapExplorer({ operations }: { operations: Operation[] }) {
       />
 
       <FilterBar
-        operations={operations}
+        operations={operationsAtMonth}
         filters={filters}
         onChange={setFilters}
         className="absolute inset-x-2 top-2 z-10 lg:left-[396px] lg:right-3 lg:top-3"
       >
+        <TimelineSelector
+          selectedMonth={selectedMonth}
+          onChange={setSelectedMonth}
+          compact
+        />
         <LayerToggle value={layer} onChange={setLayer} />
       </FilterBar>
 

@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { PlaceholderScreen } from "@/components/shell/placeholder-screen";
+import { PageSurface } from "@/components/shell/app-shell";
+import { RiskSimulator } from "@/components/simulador/risk-simulator";
 
 export const metadata: Metadata = {
-  title: "Simulador",
-  description: "Simule cenários como menos chuva ou ração mais cara e veja a nota mudar.",
+  title: "Simulador · Cenários “E se?”",
+  description: "Simulador de estresse e calibração de pesos para o indicador de risco pecuário.",
 };
 
 export default function SimuladorPage() {
-  return <PlaceholderScreen title="Simulador" />;
+  return (
+    <PageSurface>
+      <RiskSimulator />
+    </PageSurface>
+  );
 }

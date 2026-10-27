@@ -23,9 +23,9 @@ interface FilterBarProps {
 }
 
 const RISK_OPTIONS: FilterOption<RiskLevel>[] = [
-  { value: "high", label: "Alto Risco (67–100)" },
-  { value: "medium", label: "Risco Moderado (34–66)" },
-  { value: "low", label: "Baixo Risco (0–33)" },
+  { value: "high", label: "Alto Risco (< 50)" },
+  { value: "medium", label: "Risco Moderado (50–69)" },
+  { value: "low", label: "Baixo Risco (≥ 70)" },
 ];
 
 const TREND_OPTIONS: FilterOption<TrendDirection>[] = [

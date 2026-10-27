@@ -1,11 +1,10 @@
 import { RISK_CONFIG, type RiskLevel } from "@/config/risk-config";
-import type { MonthlyHistory } from "@/lib/schemas/operation";
 
 export function getRiskBracket(score: number) {
-  if (score <= RISK_CONFIG.brackets.low.max) {
+  if (score >= RISK_CONFIG.brackets.low.min) {
     return RISK_CONFIG.brackets.low;
   }
-  if (score <= RISK_CONFIG.brackets.medium.max) {
+  if (score >= RISK_CONFIG.brackets.medium.min) {
     return RISK_CONFIG.brackets.medium;
   }
   return RISK_CONFIG.brackets.high;
@@ -35,14 +34,23 @@ export const TREND_LABELS: Record<TrendDirection, string> = {
   down: "Risco em queda",
 };
 
-/** Tendência da nota entre o primeiro e o último mês do histórico. */
-export function getRiskTrend(history: MonthlyHistory[]) {
+/**
+ * Tendência da nota entre o primeiro e o último mês do histórico.
+ * No modelo da UNIPLAC: nota menor = mais risco.
+ * Portanto:
+ * - Se nota caiu (delta <= -threshold): risco em alta.
+ * - Se nota subiu (delta >= threshold): risco em queda (recuperação).
+ */
+export function getRiskTrend(history: { score: number }[]) {
+  if (!history || history.length === 0) {
+    return { delta: 0, direction: "stable" as TrendDirection, label: "Risco estável" };
+  }
   const first = history[0]?.score ?? 0;
   const last = history[history.length - 1]?.score ?? 0;
   const delta = last - first;
   const { threshold } = RISK_CONFIG.trend;
   const direction: TrendDirection =
-    delta >= threshold ? "up" : delta <= -threshold ? "down" : "stable";
+    delta <= -threshold ? "up" : delta >= threshold ? "down" : "stable";
 
   return { delta, direction, label: TREND_LABELS[direction] };
 }

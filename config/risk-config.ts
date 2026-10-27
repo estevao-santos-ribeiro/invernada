@@ -1,8 +1,10 @@
 /**
  * Configuração central do modelo de risco da Campora
  * 
- * Regra do projeto: Os pesos e faixas de risco ficam centralizados
- * neste único arquivo para facilitar calibragem pela cooperativa.
+ * Regras do projeto:
+ * - Faixas: >= 70 Risco Baixo (Verde), 50 a 69 Risco Moderado (Amarelo), < 50 Risco Alto (Vermelho)
+ * - Pesos oficiais (UNIPLAC / Integrativa SI 2026.2):
+ *   Clima: 15%, Pasto: 15%, Rebanho: 35%, Garantia: 35% (Efeito pesa mais que causa)
  */
 
 export interface RiskBrackets {
@@ -45,12 +47,12 @@ export interface RiskBrackets {
 }
 
 export const RISK_CONFIG = {
-  // Faixas de risco (0 a 100, maior = mais risco)
+  // Faixas de risco: >=70 Baixo, 50-69 Moderado, <50 Alto
   brackets: {
     low: {
-      min: 0,
-      max: 33,
-      label: "Baixo Risco",
+      min: 70,
+      max: 100,
+      label: "Risco baixo",
       level: "low",
       colorName: "green",
       badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-200",
@@ -60,9 +62,9 @@ export const RISK_CONFIG = {
       hex: "#10b981",
     },
     medium: {
-      min: 34,
-      max: 66,
-      label: "Risco Moderado",
+      min: 50,
+      max: 69,
+      label: "Risco moderado",
       level: "medium",
       colorName: "yellow",
       badgeClass: "bg-amber-100 text-amber-800 border-amber-200",
@@ -72,9 +74,9 @@ export const RISK_CONFIG = {
       hex: "#f59e0b",
     },
     high: {
-      min: 67,
-      max: 100,
-      label: "Alto Risco",
+      min: 0,
+      max: 49,
+      label: "Risco alto",
       level: "high",
       colorName: "red",
       badgeClass: "bg-rose-100 text-rose-800 border-rose-200",
@@ -85,14 +87,14 @@ export const RISK_CONFIG = {
     },
   } as const,
 
-  // Pesos dos 3 pilares para as etapas 2, 3 e 4 (Soma = 1.0)
+  // Pesos do modelo da carteira pecuária (Soma = 100)
   weights: {
-    climate: 0.4, // Clima (chuva e temperatura vs histórico)
-    pasture: 0.35, // Pastagem (NDVI via satélite Sentinel-2)
-    costs: 0.25, // Custo de alimentação / insumos
+    clima: 15, // Causa: Geadas e chuva vs normal da estação
+    pasto: 15, // Causa: Vigor do pasto / anomalia NDVI
+    rebanho: 35, // Efeito: Desvio de peso do lote vs plano sazonal
+    garantia: 35, // Efeito: Cobertura da garantia (lote / saldo)
   },
 
-  // Variação mínima (em pontos, nos últimos 6 meses) para considerar risco em alta ou em queda
   trend: {
     threshold: 5,
   },

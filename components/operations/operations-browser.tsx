@@ -11,8 +11,19 @@ import { cn } from "@/lib/utils";
 import { FilterBar } from "@/components/filters/filter-bar";
 import { SatelliteView } from "@/components/farm/satellite-view";
 
-function OperationRow({ operation }: { operation: Operation }) {
+import { TimelineSelector } from "@/components/operations/timeline-selector";
+import { getOperationsAtMonth } from "@/lib/operations";
+import type { MonthIndex } from "@/lib/indicator";
+
+function OperationRow({
+  operation,
+  selectedMonth,
+}: {
+  operation: Operation;
+  selectedMonth: MonthIndex;
+}) {
   const bracket = getRiskBracket(operation.fixedRiskScore);
+  const isMissing = operation.monthlyHistory[selectedMonth]?.known === false;
 
   return (
     <li>
@@ -28,7 +39,14 @@ function OperationRow({ operation }: { operation: Operation }) {
           className="h-14 w-14 shrink-0 rounded-xl"
         />
         <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold text-zinc-950">{operation.farmName}</p>
+          <div className="flex items-center gap-2">
+            <p className="truncate font-semibold text-zinc-950">{operation.farmName}</p>
+            {isMissing && (
+              <span className="hidden sm:inline-flex rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
+                Confiança baixa
+              </span>
+            )}
+          </div>
           <p className="truncate text-xs text-zinc-500">
             {operation.municipality}, {operation.state} · {operation.producerName}
           </p>
@@ -54,37 +72,46 @@ function OperationRow({ operation }: { operation: Operation }) {
 }
 
 export function OperationsBrowser({ operations }: { operations: Operation[] }) {
+  const [selectedMonth, setSelectedMonth] = useState<MonthIndex>(2); // Jun/26 por padrão
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<OperationFilters>(EMPTY_FILTERS);
 
+  const operationsAtMonth = useMemo(
+    () => getOperationsAtMonth(operations, selectedMonth),
+    [operations, selectedMonth]
+  );
+
   const visible = useMemo(() => {
     const term = query.trim().toLowerCase();
-    return applyFilters(operations, filters).filter(
+    return applyFilters(operationsAtMonth, filters).filter(
       (op) =>
         !term ||
         [op.farmName, op.producerName, op.municipality, op.id].some((v) => v.toLowerCase().includes(term))
     );
-  }, [operations, filters, query]);
+  }, [operationsAtMonth, filters, query]);
 
   return (
     <section className="space-y-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-        <label className="relative block lg:w-80">
-          <span className="sr-only">Buscar operação</span>
-          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar fazenda, produtor ou município"
-            className="w-full rounded-full border border-zinc-200 bg-white py-2 pl-10 pr-4 text-sm text-zinc-900 shadow-md placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950"
-          />
-        </label>
-        <FilterBar operations={operations} filters={filters} onChange={setFilters} />
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
+          <label className="relative block sm:w-80">
+            <span className="sr-only">Buscar operação</span>
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Buscar fazenda, produtor ou município"
+              className="w-full rounded-full border border-zinc-200 bg-white py-2 pl-10 pr-4 text-sm text-zinc-900 shadow-md placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950"
+            />
+          </label>
+          <FilterBar operations={operationsAtMonth} filters={filters} onChange={setFilters} />
+        </div>
+        <TimelineSelector selectedMonth={selectedMonth} onChange={setSelectedMonth} />
       </div>
 
       <p className="text-xs text-zinc-500">
-        {visible.length} de {operations.length} operações · ordenadas da maior para a menor nota de risco
+        {visible.length} de {operations.length} operações · ordenadas por maior risco primeiro (&lt; 50)
       </p>
 
       {visible.length === 0 ? (
@@ -95,7 +122,7 @@ export function OperationsBrowser({ operations }: { operations: Operation[] }) {
       ) : (
         <ul className="space-y-2">
           {visible.map((op) => (
-            <OperationRow key={op.id} operation={op} />
+            <OperationRow key={op.id} operation={op} selectedMonth={selectedMonth} />
           ))}
         </ul>
       )}

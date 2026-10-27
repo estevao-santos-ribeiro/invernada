@@ -14,10 +14,31 @@ if (!parsed.success) {
 export const operations: Operation[] = parsed.data;
 
 /**
- * Retorna todas as operações ordenadas por nota de risco decrescente (maior risco primeiro)
+ * Retorna todas as operações ordenadas por maior risco primeiro (menor nota de risco)
  */
 export function getOperationsSortedByRisk(): Operation[] {
-  return [...operations].sort((a, b) => b.fixedRiskScore - a.fixedRiskScore);
+  return [...operations].sort((a, b) => a.fixedRiskScore - b.fixedRiskScore);
+}
+
+/**
+ * Retorna uma versão da operação com a nota ajustada para o mês selecionado (0 = Abr, 2 = Jun, etc.)
+ */
+export function getOperationAtMonth(op: Operation, monthIndex: number): Operation {
+  const row = op.monthlyHistory[monthIndex];
+  if (!row) return op;
+  return {
+    ...op,
+    fixedRiskScore: row.score,
+  };
+}
+
+/**
+ * Retorna as operações ajustadas e ordenadas pelo risco do mês selecionado
+ */
+export function getOperationsAtMonth(ops: Operation[], monthIndex: number): Operation[] {
+  return ops
+    .map((op) => getOperationAtMonth(op, monthIndex))
+    .sort((a, b) => a.fixedRiskScore - b.fixedRiskScore);
 }
 
 /**

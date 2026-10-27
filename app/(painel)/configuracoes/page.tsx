@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { PlaceholderScreen } from "@/components/shell/placeholder-screen";
+import { PageSurface } from "@/components/shell/app-shell";
+import { SettingsDashboard } from "@/components/configuracoes/settings-dashboard";
 
 export const metadata: Metadata = {
-  title: "Configurações",
-  description: "Configurações do painel.",
+  title: "Configurações · Políticas de Crédito",
+  description: "Políticas institucionais de crédito pecuário, tabelas Cepea e parâmetros do modelo.",
 };
 
 export default function ConfiguracoesPage() {
-  return <PlaceholderScreen title="Configurações" />;
+  return (
+    <PageSurface>
+      <SettingsDashboard />
+    </PageSurface>
+  );
 }
