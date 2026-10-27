@@ -1,8 +1,9 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0a0a0a;
 }
 
 @theme inline {
@@ -12,15 +13,157 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  background: #2b2b2b;
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  margin: 0;
+}
+
+/* ---------- Mapa ---------- */
+
+.leaflet-container {
+  font-family: inherit;
+  z-index: 0;
+  background: #d4d4d8;
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
+  border-top-left-radius: 8px;
+  background: rgba(255, 255, 255, 0.85) !important;
+}
+
+.leaflet-bar {
+  border: none !important;
+  border-radius: 9999px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18) !important;
+}
+
+.leaflet-bar a {
+  width: 34px !important;
+  height: 34px !important;
+  line-height: 34px !important;
+  border-bottom-color: #e4e4e7 !important;
+  color: #0a0a0a !important;
+}
+
+/* Marcador: halo no chão + haste + cabeça com a nota */
+.farm-pin {
+  position: relative;
+  width: 44px;
+  height: 64px;
+  cursor: pointer;
+}
+
+.farm-pin__halo,
+.farm-pin__pulse {
+  position: absolute;
+  left: 4px;
+  bottom: 2px;
+  width: 36px;
+  height: 12px;
+  border-radius: 9999px;
+}
+
+.farm-pin__halo {
+  background: rgba(255, 255, 255, 0.35);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
+}
+
+.farm-pin__pulse {
+  background: rgba(225, 29, 72, 0.55);
+  animation: farm-pulse 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.farm-pin__stem {
+  position: absolute;
+  left: 21px;
+  bottom: 8px;
+  width: 2px;
+  height: 26px;
+  background: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.35);
+}
+
+.farm-pin__head {
+  position: absolute;
+  top: 0;
+  left: 7px;
+  width: 30px;
+  height: 30px;
+  border-radius: 9999px;
+  border: 2px solid #ffffff;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.farm-pin:hover .farm-pin__head {
+  transform: scale(1.1);
+}
+
+.farm-pin.is-selected .farm-pin__head {
+  transform: scale(1.18);
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.85), 0 6px 14px rgba(0, 0, 0, 0.4);
+}
+
+.farm-pin.is-selected .farm-pin__halo {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.farm-pin--high .farm-pin__head {
+  animation: farm-head-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes farm-pulse {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.9;
+  }
+  80%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes farm-head-pulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.25);
+  }
+}
+
+/* Tooltip translúcido sobre o marcador selecionado */
+.leaflet-tooltip.glass-tooltip {
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #ffffff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+}
+
+.leaflet-tooltip-top.glass-tooltip::before {
+  border-top-color: rgba(255, 255, 255, 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .farm-pin__pulse,
+  .farm-pin--high .farm-pin__head {
+    animation: none;
+  }
 }
